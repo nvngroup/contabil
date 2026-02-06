@@ -14,7 +14,10 @@ jobs:
       - name: Criar issue no repositório brunocgc/contabil
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          # IMPORTANTE: Para acessar repositórios privados externos, é necessário um PAT
+          # Crie um Personal Access Token com permissões 'repo' em https://github.com/settings/tokens
+          # Adicione o token como secret 'CONTABIL_PAT' nas configurações do repositório
+          github-token: ${{ secrets.CONTABIL_PAT }}
           script: |
             const originalIssue = context.payload.issue;
             const originalRepo = context.repo.repo;
