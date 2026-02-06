@@ -34,13 +34,13 @@ jobs:
             const originalLabels = originalIssue.labels.map(label => label.name);
             
             // Criar corpo da nova issue com referência à original
-            const newIssueBody = `> 🔗 **Issue original:** ${issueUrl}
-> 👤 **Criado por:** @${issueUser}
-> 📍 **Repositório:** ${originalOwner}/${originalRepo}#${issueNumber}
-
----
-
-${issueBody}`;
+            const linkIcon = '🔗';
+            const userIcon = '👤';
+            const repoIcon = '📍';
+            const newIssueBody = `> ${linkIcon} **Issue original:** ${issueUrl}\n` +
+              `> ${userIcon} **Criado por:** @${issueUser}\n` +
+              `> ${repoIcon} **Repositório:** ${originalOwner}/${originalRepo}#${issueNumber}\n\n` +
+              `---\n\n${issueBody}`;
 
             try {
               // Criar a issue no repositório de destino
