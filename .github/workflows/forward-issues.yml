@@ -11,7 +11,25 @@ jobs:
     permissions:
       issues: write
     steps:
+      - name: Verificar se PAT está configurado
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const patExists = '${{ secrets.CONTABIL_PAT }}' !== '';
+            if (!patExists) {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: '⚠️ **Configuração Pendente:** O Personal Access Token (CONTABIL_PAT) não está configurado.\n\n' +
+                      'Esta issue não pode ser automaticamente enviada para brunocgc/contabil.\n\n' +
+                      'Por favor, consulte a [documentação de configuração](https://github.com/nvngroup/contabil/blob/main/.github/WORKFLOW_SETUP.md) para configurar o PAT.'
+              });
+              core.setFailed('CONTABIL_PAT secret não configurado');
+            }
+      
       - name: Criar issue no repositório brunocgc/contabil
+        if: success()
         uses: actions/github-script@v7
         with:
           # IMPORTANTE: Para acessar repositórios privados externos, é necessário um PAT
