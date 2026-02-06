@@ -1,0 +1,85 @@
+name: 🐛 Relatório de Bug
+description: Reporte um bug ou comportamento inesperado
+title: "[BUG] "
+labels: ["bug", "precisa-triagem"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por reportar um bug! Por favor, preencha os campos abaixo para nos ajudar a entender e resolver o problema.
+  
+  - type: textarea
+    id: description
+    attributes:
+      label: Descrição do Bug
+      description: Uma descrição clara e concisa do bug
+      placeholder: O que aconteceu?
+    validations:
+      required: true
+  
+  - type: textarea
+    id: steps
+    attributes:
+      label: Passos para Reproduzir
+      description: Passos para reproduzir o comportamento
+      placeholder: |
+        1. Vá para '...'
+        2. Clique em '...'
+        3. Veja o erro
+    validations:
+      required: true
+  
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportamento Esperado
+      description: O que você esperava que acontecesse?
+      placeholder: Descreva o comportamento esperado
+    validations:
+      required: true
+  
+  - type: textarea
+    id: actual
+    attributes:
+      label: Comportamento Atual
+      description: O que aconteceu na realidade?
+      placeholder: Descreva o comportamento atual
+    validations:
+      required: true
+  
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: Se aplicável, adicione screenshots para ajudar a explicar o problema
+      placeholder: Cole ou arraste imagens aqui
+  
+  - type: textarea
+    id: environment
+    attributes:
+      label: Ambiente
+      description: Informações sobre o ambiente onde o bug ocorreu
+      placeholder: |
+        - SO: [ex: Windows 10, Ubuntu 20.04]
+        - Navegador: [ex: Chrome 96, Firefox 95]
+        - Versão: [ex: 1.0.0]
+    validations:
+      required: false
+  
+  - type: textarea
+    id: additional
+    attributes:
+      label: Informações Adicionais
+      description: Qualquer outra informação relevante sobre o problema
+      placeholder: Adicione contexto adicional aqui
+  
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      description: Confirme os itens abaixo antes de submeter
+      options:
+        - label: Eu verifiquei que não existe uma issue similar já criada
+          required: true
+        - label: Eu forneci todas as informações necessárias para reproduzir o bug
+          required: true

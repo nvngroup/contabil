@@ -1,0 +1,71 @@
+name: Validação de Issues
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  validate:
+    name: Validar Conteúdo da Issue
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Verificar qualidade da issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const title = issue.title;
+            const body = issue.body || '';
+            
+            let warnings = [];
+            let isValid = true;
+
+            // Verificar se o título é muito curto
+            if (title.length < 10) {
+              warnings.push('⚠️ O título da issue é muito curto. Por favor, forneça um título mais descritivo (mínimo 10 caracteres).');
+              isValid = false;
+            }
+
+            // Verificar se o corpo está vazio ou muito curto
+            if (body.trim().length < 20) {
+              warnings.push('⚠️ A descrição da issue é muito curta. Por favor, forneça mais detalhes (mínimo 20 caracteres).');
+              isValid = false;
+            }
+
+            // Verificar se contém apenas placeholder text
+            const placeholders = ['...', 'TODO', 'FIXME', 'lorem ipsum'];
+            if (placeholders.some(p => body.toLowerCase().includes(p.toLowerCase()))) {
+              warnings.push('ℹ️ Parece que a issue contém texto de placeholder. Certifique-se de preencher todas as seções.');
+            }
+
+            // Se houver warnings, adicionar comentário
+            if (warnings.length > 0) {
+              const warningMessage = `## 📋 Revisão Automática da Issue\n\n${warnings.join('\n\n')}\n\n---\n\nPor favor, edite a issue para fornecer mais informações. Isso nos ajudará a resolver seu problema mais rapidamente!`;
+              
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: warningMessage
+              });
+
+              // Se não for válida, adicionar label
+              if (!isValid) {
+                await github.rest.issues.addLabels({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  labels: ['precisa-informações']
+                });
+              }
+            } else {
+              // Issue está bem formatada
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: '✅ Obrigado por fornecer uma issue bem detalhada! Isso nos ajuda muito.'
+              });
+            }

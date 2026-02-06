@@ -1,0 +1,72 @@
+name: Enviar Issues para brunocgc/contabil
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  forward-issue:
+    name: Replicar Issue para brunocgc/contabil
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Criar issue no repositório brunocgc/contabil
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const originalIssue = context.payload.issue;
+            const originalRepo = context.repo.repo;
+            const originalOwner = context.repo.owner;
+            
+            // Informações da issue original
+            const issueTitle = originalIssue.title;
+            const issueBody = originalIssue.body || '';
+            const issueUser = originalIssue.user.login;
+            const issueUrl = originalIssue.html_url;
+            const issueNumber = originalIssue.number;
+            
+            // Labels da issue original
+            const originalLabels = originalIssue.labels.map(label => label.name);
+            
+            // Criar corpo da nova issue com referência à original
+            const newIssueBody = `> 🔗 **Issue original:** ${issueUrl}
+> 👤 **Criado por:** @${issueUser}
+> 📍 **Repositório:** ${originalOwner}/${originalRepo}#${issueNumber}
+
+---
+
+${issueBody}`;
+
+            try {
+              // Criar a issue no repositório de destino
+              const newIssue = await github.rest.issues.create({
+                owner: 'brunocgc',
+                repo: 'contabil',
+                title: `[${originalOwner}/${originalRepo}#${issueNumber}] ${issueTitle}`,
+                body: newIssueBody,
+                labels: originalLabels.length > 0 ? originalLabels : undefined
+              });
+
+              console.log(`✅ Issue criada com sucesso em brunocgc/contabil: ${newIssue.data.html_url}`);
+
+              // Adicionar comentário na issue original com link para a nova issue
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `✅ Esta issue foi automaticamente enviada para brunocgc/contabil.\n\n🔗 Link: ${newIssue.data.html_url}`
+              });
+
+            } catch (error) {
+              console.error('❌ Erro ao criar issue:', error);
+              
+              // Adicionar comentário na issue original informando o erro
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `⚠️ Não foi possível enviar automaticamente esta issue para brunocgc/contabil.\n\nErro: ${error.message}\n\nPor favor, verifique as permissões do workflow.`
+              });
+            }

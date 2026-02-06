@@ -1,0 +1,119 @@
+name: Gerenciamento de Issues
+
+on:
+  issues:
+    types: [opened, labeled, edited]
+
+jobs:
+  welcome:
+    name: Mensagem de Boas-vindas
+    runs-on: ubuntu-latest
+    if: github.event.action == 'opened'
+    permissions:
+      issues: write
+    steps:
+      - name: Adicionar comentário de boas-vindas
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issueComment = `👋 Olá @${context.payload.issue.user.login}!
+
+            Obrigado por abrir esta issue! Um membro da equipe irá revisar em breve.
+
+            Enquanto isso, certifique-se de que você:
+            - ✅ Forneceu todas as informações necessárias
+            - ✅ Verificou se não há issues duplicadas
+            - ✅ Seguiu o template apropriado
+
+            Agradecemos sua contribuição para o projeto Contabil! 🎉`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: issueComment
+            });
+
+  auto-label:
+    name: Auto-labelar Issues
+    runs-on: ubuntu-latest
+    if: github.event.action == 'opened'
+    permissions:
+      issues: write
+    steps:
+      - name: Adicionar labels automáticos
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const title = issue.title.toLowerCase();
+            const body = issue.body ? issue.body.toLowerCase() : '';
+            const labels = [];
+
+            // Auto-label baseado no título
+            if (title.includes('[bug]')) {
+              labels.push('bug');
+            }
+            if (title.includes('[feature]')) {
+              labels.push('enhancement');
+            }
+            if (title.includes('[pergunta]') || title.includes('[question]')) {
+              labels.push('question');
+            }
+
+            // Auto-label baseado no conteúdo
+            if (body.includes('documentação') || body.includes('documentation')) {
+              labels.push('documentation');
+            }
+            if (body.includes('performance')) {
+              labels.push('performance');
+            }
+            if (body.includes('segurança') || body.includes('security')) {
+              labels.push('security');
+            }
+
+            // Adicionar labels se houver algum
+            if (labels.length > 0) {
+              github.rest.issues.addLabels({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                labels: labels
+              });
+            }
+
+  stale-check:
+    name: Verificar Issues Inativas
+    runs-on: ubuntu-latest
+    if: github.event.action == 'labeled'
+    permissions:
+      issues: write
+    steps:
+      - name: Marcar issues antigas
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const now = new Date();
+            const updatedAt = new Date(issue.updated_at);
+            const daysSinceUpdate = Math.floor((now - updatedAt) / (1000 * 60 * 60 * 24));
+
+            // Se a issue não foi atualizada há mais de 30 dias
+            if (daysSinceUpdate > 30) {
+              const labels = issue.labels.map(label => label.name);
+              if (!labels.includes('stale')) {
+                github.rest.issues.addLabels({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  labels: ['stale']
+                });
+
+                github.rest.issues.createComment({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body: '⏰ Esta issue parece estar inativa há algum tempo. Se ainda for relevante, por favor, forneça uma atualização.'
+                });
+              }
+            }
