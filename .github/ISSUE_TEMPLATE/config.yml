@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📚 Documentação
+    url: https://github.com/nvngroup/contabil/blob/main/README.md
+    about: Consulte a documentação do projeto antes de abrir uma issue
+  - name: 💬 Discussões
+    url: https://github.com/nvngroup/contabil/discussions
+    about: Participe de discussões gerais sobre o projeto (quando disponível)

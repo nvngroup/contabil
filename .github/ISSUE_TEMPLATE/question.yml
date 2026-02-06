@@ -1,0 +1,54 @@
+name: ❓ Pergunta ou Dúvida
+description: Faça uma pergunta sobre o projeto
+title: "[PERGUNTA] "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por fazer uma pergunta! Estamos aqui para ajudar.
+  
+  - type: textarea
+    id: question
+    attributes:
+      label: Sua Pergunta
+      description: Descreva sua pergunta ou dúvida de forma clara
+      placeholder: Como posso...?
+    validations:
+      required: true
+  
+  - type: textarea
+    id: context
+    attributes:
+      label: Contexto
+      description: Forneça qualquer contexto adicional que possa ajudar a responder sua pergunta
+      placeholder: Eu estava tentando... quando...
+    validations:
+      required: false
+  
+  - type: textarea
+    id: attempted
+    attributes:
+      label: O que Você Já Tentou
+      description: Descreva o que você já tentou fazer
+      placeholder: Eu já tentei... mas...
+    validations:
+      required: false
+  
+  - type: textarea
+    id: additional
+    attributes:
+      label: Informações Adicionais
+      description: Qualquer outra informação que possa ser útil
+      placeholder: Links, código, screenshots, etc.
+  
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      description: Confirme os itens abaixo antes de submeter
+      options:
+        - label: Eu verifiquei a documentação antes de fazer esta pergunta
+          required: true
+        - label: Eu pesquisei por perguntas similares nas issues existentes
+          required: true
