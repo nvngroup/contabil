@@ -10,7 +10,7 @@ Atualmente, oferecemos suporte de segurança apenas para a versão estável mais
 | :---------------- | :--------------- |
 | **Latest Stable** | ✅ Suportado     |
 | **Dev Branch**    | ⚠️ Experimental  |
-| < 0.9.0           | ❌ Não suportado |
+| < 0.9.1           | ❌ Não suportado |
 
 ## 🚨 Como Reportar uma Vulnerabilidade
 
@@ -27,6 +27,48 @@ Levamos a segurança a sério. Se você descobrir uma vulnerabilidade de seguran
 
 Faremos o possível para corrigir a vulnerabilidade rapidamente e coordenar a divulgação pública.
 
+## 🔐 Medidas de Segurança Implementadas
+
+O projeto utiliza diversas camadas de segurança para proteger dados e usuários:
+
+### 1. Autenticação e Autorização
+
+- **Supabase Auth**: Gerenciamento robusto de sessões e usuários via JWT.
+- **Row Level Security (RLS)**: Isolamento estrito de dados no banco de dados PostgreSQL.
+  - Cada requisição é autenticada e o acesso aos dados é restrito pelo `user_id` e `tenant_id`.
+  - Políticas de "Deny by Default".
+
+### 2. Segurança de API e Rotas
+
+- **Middleware**: Proteção de rotas no Next.js (`middleware.ts`).
+- **Validação de Dados**: Uso intensivo de **Zod** para validar todas as entradas de API, prevenindo injeção de dados maliciosos.
+- **Server Actions**: Execução segura no servidor, sem expor lógica sensível ao cliente.
+
+### 3. Cabeçalhos HTTP (Security Headers)
+
+Configurados no `next.config.js` para mitigar ataques comuns:
+
+- **Strict-Transport-Security (HSTS)**: Força HTTPS.
+- **X-Frame-Options**: `SAMEORIGIN` (previne Clickjacking).
+- **X-Content-Type-Options**: `nosniff` (previne MIME Sniffing).
+- **X-XSS-Protection**: `1; mode=block` (proteção contra XSS).
+- **Referrer-Policy**: `origin-when-cross-origin`.
+
+### 4. Proteção de Dados
+
+- **Criptografia**: Dados sensíveis criptografados em repouso (Supabase) e em trânsito (HTTPS/TLS).
+- **Variáveis de Ambiente**: Segredos gerenciados via `.env.local` e nunca commitados no repositório.
+
+## 🛠️ Diretrizes para Desenvolvimento Seguro
+
+Ao contribuir com código, siga estas práticas:
+
+- **Nunca commite chaves de API ou segredos**.
+- **Use parâmetros em queries SQL** (ou deixe o ORM/Supabase client lidar com isso) para evitar SQL Injection.
+- **Valide todos os inputs** usando os schemas Zod já definidos.
+- **Sanitize outputs** no frontend (React já faz isso por padrão para XSS, mas tenha cuidado com `dangerouslySetInnerHTML`).
+- **Mantenha dependências atualizadas**: Execute `pnpm audit` regularmente.
+
 ## 📄 License
 
-Este projeto é licenciado sob a licença The Unlicense. Consulte o arquivo `LICENSE` para mais detalhes.
+Este projeto é licenciado sob a licença MIT. Consulte o arquivo `LICENSE` para mais detalhes.
