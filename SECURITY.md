@@ -10,7 +10,7 @@ Atualmente, oferecemos suporte de segurança apenas para a versão estável mais
 | :---------------- | :--------------- |
 | **Latest Stable** | ✅ Suportado     |
 | **Dev Branch**    | ⚠️ Experimental  |
-| < 0.9.1           | ❌ Não suportado |
+| < 0.11.0           | ❌ Não suportado |
 
 ## 🚨 Como Reportar uma Vulnerabilidade
 
